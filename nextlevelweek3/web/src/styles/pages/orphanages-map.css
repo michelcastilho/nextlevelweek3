@@ -60,3 +60,7 @@
 
     transition: background-color 0.4s;
 }
+
+#page-map .leaflet-container {
+    z-index: 5;
+}
