@@ -31,6 +31,7 @@ export default {
     async create(request: Request, response: Response) { //USAR "async" SEMPRE QUE PRECISAR USAR AWAIT. QUERYS SÃO ASSÍNCRONAS!!
 
         console.log(request.body);
+        console.log(request.files);
     //console.log(request.query);
     //console.log(request.params);
 
@@ -46,6 +47,12 @@ export default {
 
     const OrphanagesRepository = getRepository(Orphanage);
 
+    const requestImages = request.files as Express.Multer.File[];
+
+    const images = requestImages.map(image => {
+        return { path: image.filename }
+    })
+
     const orphanage =  OrphanagesRepository.create({
         name,
         latitude,
@@ -53,7 +60,8 @@ export default {
         about,
         instructions,
         opening_hours,
-        open_on_weekends
+        open_on_weekends,
+        images
     });
 
     await OrphanagesRepository.save(orphanage);
