@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 
 import { getRepository  } from 'typeorm';
 
+import orphanageView from '../views/orphanages_view';
+
 import Orphanage from '../models/Orphanage';
+
+import * as Yup from 'yup'; // * as Objeto é utilizado para importar tudo de dentro de um arquivo quando o arquivo não possui return default
 
 export default {
 
@@ -10,9 +14,11 @@ export default {
 
         const OrphanagesRepository = getRepository(Orphanage);
 
-        const orphanages = await OrphanagesRepository.find();
+        const orphanages = await OrphanagesRepository.find({
+            relations: ['images']
+        });
 
-        return response.json(orphanages);
+        return response.json(orphanageView.renderMany(orphanages));
 
     },
 
@@ -22,9 +28,11 @@ export default {
 
         const OrphanagesRepository = getRepository(Orphanage);
 
-        const orphanage = await OrphanagesRepository.findOneOrFail(id);
+        const orphanage = await OrphanagesRepository.findOneOrFail(id, {
+            relations: ['images']
+        });
 
-        return response.json(orphanage);
+        return response.json(orphanageView.render(orphanage));
 
     },
 
@@ -53,7 +61,7 @@ export default {
         return { path: image.filename }
     })
 
-    const orphanage =  OrphanagesRepository.create({
+    const data = {
         name,
         latitude,
         longitude,
@@ -62,7 +70,28 @@ export default {
         opening_hours,
         open_on_weekends,
         images
+    };
+
+    const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        latitude: Yup.number().required(),
+        longitude: Yup.number().required(),
+        about: Yup.string().required().max(300),
+        instructions: Yup.string().required(),
+        opening_hours: Yup.string().required(),
+        open_on_weekends: Yup.boolean().required(),
+        images: Yup.array(
+            Yup.object().shape({
+                path: Yup.string().required()
+            })
+        )
     });
+
+    await schema.validate(data, {
+        abortEarly: false // garante que todos os erros sejam exibidos. True retorna apenas o primeiro erro e para
+    })
+
+    const orphanage =  OrphanagesRepository.create(data);
 
     await OrphanagesRepository.save(orphanage);
 
