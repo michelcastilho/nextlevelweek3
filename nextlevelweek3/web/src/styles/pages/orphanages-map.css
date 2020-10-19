@@ -99,3 +99,8 @@
 #page-map .map-popup .leaflet-popup-tip-container {
     display: none;
 }
+
+#page-map .mapinha {
+    max-width: 200px;
+    padding: 40px 10px;
+}
