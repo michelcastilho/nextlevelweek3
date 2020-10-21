@@ -17,7 +17,7 @@ interface Orphanage {
   about: string;
   instructions: string;
   opening_hours: string;
-  open_on_weekends: string;
+  open_on_weekends: boolean;
   images: Array<{
     id: number;
     url: string;
@@ -31,12 +31,10 @@ interface OrphanageParams {
 export default function Orphanage() {
 
   const params = useParams<OrphanageParams>();
-
   const [orphanage, setOrphanage] = useState<Orphanage>();
-
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  console.log(orphanage);
+  //console.log(orphanage);
 
   useEffect(() => {
       api.get(`orphanages/${params.id}`).then(response => {
@@ -109,17 +107,17 @@ export default function Orphanage() {
                 Segunda à Sexta <br />
                 {orphanage.opening_hours}
               </div>
-              {orphanage.open_on_weekends ? (
+              { orphanage.open_on_weekends ? (
                 <div className="open-on-weekends">
-                <FiInfo size={32} color="#39CC83" />
-                Atendemos <br />
-                fim de semana
+                  <FiInfo size={32} color="#39CC83" />
+                  Atendemos <br />
+                  fim de semana
                 </div>
-              ) :(
+              ) : (
                 <div className="open-on-weekends dont-open">
-                <FiInfo size={32} color="#FF669D" />
-                Não atendemos <br />
-                fim de semana
+                  <FiInfo size={32} color="#FF6690" />
+                  Não Atendemos <br />
+                  fim de semana
                 </div>
               ) }
             </div>
